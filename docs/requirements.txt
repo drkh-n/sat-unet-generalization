@@ -1,0 +1,17 @@
+--extra-index-url https://download.pytorch.org/whl/cu121
+
+comet_ml==3.49.3
+einops==0.8.1
+imgaug==0.4.0
+lightning==2.4.0
+matplotlib==3.10.3
+numpy==1.26.4 # numpy<2 or 2.2.6
+opencv_python==4.10.0.84
+pandas==2.2.3
+pytorch_lightning==2.4.0
+PyYAML==6.0.2
+torch==2.3.1+cu121
+torchmetrics==1.6.0
+torchvision==0.18.1+cu121
+tqdm==4.67.1
+plotly==6.3.0

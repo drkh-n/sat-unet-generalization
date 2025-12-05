@@ -1,0 +1,109 @@
+xp_config:
+  model_type: Segmentation 
+  model_name: &model_name SatUNet
+  dataset: 38-Cloud_training
+  class_num: &class_num 1 # 0 and 1 - classification 
+  cfg_version: &cfg_v torch4
+
+training:
+  type: &type multi_gpu #multi_gpu torch lightning
+  multi_gpu:
+    status: &ddp true
+    world_size: &world_size 2
+    # ipv6: 
+    ip: 127.0.0.1
+    port: 9999
+    backend: gloo
+  
+data:
+  data_root: /mnt/d/38-cloud_training
+  train_colors: 
+    - !!str 'train_nir'
+    - !!str 'train_red'
+    - !!str 'train_green'
+    - !!str 'train_blue'
+    - !!str 'train_gt'
+  valid_colors:
+    - !!str 'valid_nir'
+    - !!str 'valid_red'
+    - !!str 'valid_green'
+    - !!str 'valid_blue'
+    - !!str 'valid_gt'
+  pin_memory: true
+  shuffle: true
+  num_workers: 2 #2 is the fastest for Windows
+  persistent_workers: !!bool true
+  train_batch_size: &train_batch_size 32
+  valid_batch_size: 128
+  seed: 42
+  augment: false
+  type: *type
+  multi_gpu: *ddp
+  normalization:
+    enabled: false
+    csv_path: 38-Cloud-8bit_percentiles.csv
+    p_low: 1
+    p_high: 99
+
+optim: &optim
+  type: Adam  # default 
+  Adam: 
+    lr: !!float 1.0e-4   
+    weight_decay: !!float 1.0e-3
+  SGD:
+    lr: !!float 1.0e-4  
+    momentum: 0.5
+    weight_decay: !!float 1.0e-4
+
+model:
+  in_channels: 4
+  out_channels: *class_num #num of classes 
+  optim_params: *optim 
+
+trainer:
+  accelerator: gpu
+  devices: 1
+  num_nodes: 1 
+  fast_dev_run: false 
+  precision: bf16-mixed
+  accumulate_grad_batches: 1
+  profiler: false
+  check_val_every_n_epoch: 1
+  max_epochs: 200
+  detect_anomaly: false
+  enable_model_summary: true # nn info
+  deterministic: false
+  benchmark: true
+
+model_ckpt:
+  monitor: valid_loss
+  filename: '{epoch:02d}'
+  save_last: true
+
+resumed: false
+
+early_stop:
+  mode: min 
+  patience: 15
+  verbose: true
+
+logs:
+  type: comet #tb_logs comet_light comet
+  comet:
+    project_name: satunet-only-normal, 
+    api_key: "API_KEY"
+  tb_logs:
+    version: *cfg_v
+  batch_size: *train_batch_size
+
+
+
+# inferece
+# barebones: true # enable all features that may impact raw speed are disabled 
+# inferece_mode: true # inference mode
+
+#test model
+# fast_dev_run: false
+# overfit_batches: 100 or 100.0 (batches num and %) of dataset:
+
+
