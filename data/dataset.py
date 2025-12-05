@@ -145,12 +145,15 @@ class CloudDataset(torch.utils.data.Dataset):
         y = cv2.imread(self.files[idx][-1], cv2.IMREAD_GRAYSCALE)//255
         y = torch.tensor(y, dtype=torch.int64)
         x = torch.empty(len(self.files[idx])-1, *y.shape, dtype=torch.float32)
-        # df = pd.read_csv(self.normalization['csv_path'], usecols=[str(self.normalization['p_high']), str(self.normalization['p_low'])])
+        if self.normalization is not None:
+            df = pd.read_csv(self.normalization['csv_path'], usecols=[str(self.normalization['p_high']), str(self.normalization['p_low'])])
         for i in range(x.shape[0]):
-            # p_low = df[str(self.normalization['p_low'])][i]
-            # p_high = df[str(self.normalization['p_high'])][i]
-            # x[i] = torch.from_numpy( (cv2.imread(self.files[idx][i], cv2.IMREAD_GRAYSCALE) - p_low) / (p_high - p_low) )     
-            x[i] = torch.from_numpy(cv2.imread(self.files[idx][i], cv2.IMREAD_GRAYSCALE)/255)        
+            if self.normalization is not None:
+                p_low = df[str(self.normalization['p_low'])][i]
+                p_high = df[str(self.normalization['p_high'])][i]
+                x[i] = torch.from_numpy( (cv2.imread(self.files[idx][i], cv2.IMREAD_GRAYSCALE) - p_low) / (p_high - p_low) )     
+            else:
+                x[i] = torch.from_numpy(cv2.imread(self.files[idx][i], cv2.IMREAD_GRAYSCALE)/255)        
         if self.augment:
             pass
             # x, y = STD_TRANSFROMS(x, y)

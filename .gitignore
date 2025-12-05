@@ -22,4 +22,5 @@ env/
 .env/
 .vscode/
 
-samples/
+*.csv
+transfer.py

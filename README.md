@@ -1,4 +1,4 @@
-# SAT-UNET: Official Repository
+# SAT-UNET: Improving Generalization and cross-dataset inference
 
 This is the official implementation of the SAT-UNET model, as described in our paper:  
 **[GhalamClouds: Remote Sensing docs/images for Kazakhstan and Clouds Segmentation Using SAT-UNet](https://www.sciencedirect.com/science/article/pii/S0273117725011299)**
@@ -8,6 +8,21 @@ This is the official implementation of the SAT-UNET model, as described in our p
 ## Description
 
 SAT-UNET is a deep learning model for cloud semantic segmentation, designed for remote sensing imagery. This repository provides all necessary code, configuration files, and utilities to train, validate, and infer with SAT-UNET, including multi-GPU support and experiment logging.
+
+### 🚀 New in this Version
+
+This repository has been updated to include methods for improving cross-dataset generalization, specifically targeting the domain shift between satellites (e.g., Landsat-8 vs. KazSTSat).
+
+Key updates include:
+
+- Sat-SlideMix Augmentation: Implementation of the batch-level normalization technique adapted from Hopkins et al. (2025).
+
+- Percentile-Based Normalization: A robust 1-99th percentile linear normalization strategy.
+
+**Key Findings**:
+In our recent experiments, we observed that while percentile-based normalization significantly speeds up convergence and stability, Sat-SlideMix drives the major improvements in performance metrics, while combination of these provide the best cross-dataset inference.
+
+**New SOTA**: We achieved a new F1-score record of 97.87% on the Cloud-38 benchmark (surpassing the previously reported 97.69%).
 
 ---
 
@@ -82,7 +97,34 @@ Here is the visual diagram of our proposed NLP-inspired attention block for Sat-
 
 ---
 
-## Ablation Results
+## Sat-SlideMix and 1-99th Normalization Visualization Results
+
+We conducted extensive experiments to validate the impact of our new augmentation and normalization pipeline.
+
+Models are trained on 38-Cloud and tested on GhalamClouds80.
+
+Note: No Norm means simple normalization, which is division by 8-bit maximum range (255). 
+
+<table>
+  <tr>
+    <td>NIR</td>
+    <td>GT</td>
+    <td>No Norm, No Aug</td>
+    <td>Norm, No Aug</td>
+    <td>No Norm, Sat-SlideMix</td>
+    <td>Norm, Sat-SlideMix</td>
+  </tr>
+  <tr>
+    <td><img src="samples/ghalam80/nir_ghalam80.png"            width="100"/></td>
+    <td><img src="samples/ghalam80/gt_ghalam80.png"             widht="100"/></td>
+    <td><img src="samples/no-aug-no-norm/NO-AU-NO-NORM.png"     widht="100"/></td>
+    <td><img src="samples/no-aug-norm/NORM-NO-AUG_ghalam80.png" widht="100"/></td>
+    <td><img src="samples/aug-no-norm/NO-NORM-AUG_ghalam80.png" widht="100"/></td>
+    <td><img src="samples/aug-norm/FINAL_ghalam80.png"          widht="100"/></td>
+  </tr>
+</table>
+
+<!-- ## Ablation Results
 
 We performed ablation study with our attention mechanism. We compare it to WITHOUT Attention, Squeeze-&-Excitation block, and CBAM module.
 
@@ -132,7 +174,7 @@ We performed ablation study with our attention mechanism. We compare it to WITHO
     <td><img src="docs/images/cbam_220.png" width="100"/></td>
     <td><img src="docs/images/proposed_220.png" width="100"/></td>
   </tr>
-</table>
+</table> -->
 
 ---
 
